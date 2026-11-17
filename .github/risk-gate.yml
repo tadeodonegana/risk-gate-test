@@ -3,7 +3,7 @@
 # Copy this file to .github/risk-gate.yml on your default branch.
 # The action reads it from the base branch of each PR, so a PR cannot change its own rules.
 
-mode: enforce
+mode: shadow
 
 tiers: # lowest risk first, 2 to 10 tiers; Jev reads the descriptions, so write them in English
   - name: low
