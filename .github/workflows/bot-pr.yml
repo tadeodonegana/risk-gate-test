@@ -1,0 +1,28 @@
+# Opens a pull request as github-actions[bot], to test agent PRs and approvals.
+name: bot-pr
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch name for the bot PR
+        required: true
+        default: bot/docs-typo
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          echo "Small docs fix from a bot." >> README.md
+          git commit -am "docs: small fix from a bot"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "docs: small fix from a bot" --body "Opened by github-actions[bot] to test agent PRs."

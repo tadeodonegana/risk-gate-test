@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/tadeodonegana/risk-gate/v1/schema/risk-gate.schema.json
+#
+# Copy this file to .github/risk-gate.yml on your default branch.
+# The action reads it from the base branch of each PR, so a PR cannot change its own rules.
+
+mode: enforce
+
+tiers: # lowest risk first, 2 to 10 tiers; Jev reads the descriptions, so write them in English
+  - name: low
+    description: Docs, tests, comments or copy. No change to runtime behavior.
+    approvals: 0
+  - name: medium
+    description: A normal feature or bug fix inside one module.
+    approvals: 1
+  - name: high
+    description: Shared code, a public API, the data model or payments.
+    approvals: 2
+  - name: critical
+    description: Authentication, permissions, secrets, infrastructure or database migrations.
+    approvals: 2
+
+# Deterministic rules. Each rule sets the lowest tier that a matched PR can get.
+# A rule matches only when all of its parts match.
+# Changes to .github/workflows/** and to this file always get the highest tier.
+rules:
+  - name: migrations and infra
+    paths: ["**/migrations/**", "infra/**", "**/*.tf"]
+    min_tier: high
+  - name: auth code
+    paths: ["**/auth/**"]
+    min_tier: critical
+  - name: large change
+    min_changed_lines: 800
+    min_tier: high
+
+# true: a PR opened by a bot account (an agent such as claude[bot] or Copilot)
+# needs at least 1 human approval, also when its tier needs 0.
+require_human_for_agent_prs: true
+
+decider:
+  model: typesafe/jev-1.14 # pin a version; a new model can move the tiers
+  on_error: critical # fail closed when Jev fails

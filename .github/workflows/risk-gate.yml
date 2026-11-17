@@ -1,0 +1,28 @@
+# Copy this file to .github/workflows/risk-gate.yml.
+# Then make "risk-gate" a required status check in a branch ruleset.
+name: risk-gate
+
+on:
+  # pull_request_target gives the API key to PRs from forks too.
+  # risk-gate never checks out or runs the PR code. It reads the diff through the API.
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+concurrency:
+  group: risk-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  risk-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tadeodonegana/risk-gate@main
+        with:
+          api-key: ${{ secrets.OPENROUTER_API_KEY }}
