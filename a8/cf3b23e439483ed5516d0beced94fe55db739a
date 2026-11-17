@@ -1,0 +1,9 @@
+.github/risk-gate.yml
+  ai_agent 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a8cf3b23e439483ed5516d0beced94fe55db739a",
+  "prompts": {}
+}
